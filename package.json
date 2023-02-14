@@ -1,0 +1,32 @@
+{
+  "name": "hardhat-fund-me",
+  "author": "Safar Kurbonov",
+  "devDependencies": {
+    "@chainlink/contracts": "^0.6.1",
+    "@nomiclabs/hardhat-ethers": "npm:hardhat-deploy-ethers",
+    "@nomiclabs/hardhat-etherscan": "^3.0.0",
+    "@nomiclabs/hardhat-waffle": "^2.0.0",
+    "chai": "^4.2.0",
+    "dotenv": "^10.0.0",
+    "ethereum-waffle": "^3.0.0",
+    "ethers": "5.0.0",
+    "hardhat": "^2.12.6",
+    "hardhat-contract-sizer": "^2.8.0",
+    "hardhat-deploy": "^0.11.23",
+    "hardhat-gas-reporter": "^1.0.4",
+    "prettier": "^2.3.2",
+    "prettier-plugin-solidity": "^1.0.0-beta.13",
+    "solhint": "^3.3.6",
+    "solidity-coverage": "^0.7.16"
+  },
+  "scripts": {
+    "test": "yarn hardhat test",
+    "test:staging": "yarn hardhat test --network goeril",
+    "lint": "yarn solhint 'contracts/*.sol'",
+    "lint:fix": "yarn solhint 'contracts/*.sol' --fix",
+    "format": "yarn prettier --write .",
+    "deploy": "yarn hardhat deploy",
+    "deploy:local": "yarn hardhat deploy --network localhost",
+    "deploy:goeril": "yarn hardhat deploy --network goeril"
+  }
+}
