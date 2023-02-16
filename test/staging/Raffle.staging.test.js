@@ -55,7 +55,6 @@ developmentChains.includes(network.name)
             await tx.wait(1)
             console.log("Ok, time to wait...")
             const winnerStartingBalance = await accounts[0].getBalance()
-
             // and this code WONT complete until our listener has finished listening!
           })
         })
