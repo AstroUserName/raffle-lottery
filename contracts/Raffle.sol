@@ -178,4 +178,8 @@ contract Raffle is VRFConsumerBaseV2, AutomationCompatible {
   function getLatestTimestamp() public view returns (uint256) {
     return s_lastTimeStamp;
   }
+
+  function getInterval() public view returns (uint256) {
+    return i_interval;
+  }
 }
