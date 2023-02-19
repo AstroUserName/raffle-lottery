@@ -17,6 +17,10 @@ module.exports = {
       chainId: 31337,
       blockConfirmation: 1,
     },
+    localhost: {
+      chainId: 31337,
+      blockConfirmations: 1,
+    },
     goerli: {
       url: process.env.GOERIL_URL || "",
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
@@ -33,7 +37,15 @@ module.exports = {
       default: 1,
     },
   },
+  gasReporter: {
+    enabled: false,
+    currency: "USD",
+    outputFile: "gas-report.txt",
+    noColors: true,
+    // coinmarketcap: process.env.COINMARKETCAP_API_KEY,
+  },
   etherscan: {
     apiKey: process.env.ETHERSCAN_API_KEY,
   },
+  mocha: { timeout: 100000000 },
 }

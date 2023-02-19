@@ -46,7 +46,7 @@ contract Raffle is VRFConsumerBaseV2, AutomationCompatible {
   // Events (we have none!)
   event RaffleEnter(address indexed player);
   event RequestedRaffleWinner(uint256 indexed requestId);
-  event WinerPicked(address indexed winner);
+  event WinnerPicked(address indexed winner);
 
   // Modifiers
   modifier onlyOwner() {
@@ -148,7 +148,7 @@ contract Raffle is VRFConsumerBaseV2, AutomationCompatible {
     if (!success) {
       revert Raffle__TransferFailed();
     }
-    emit WinerPicked(recentWinner);
+    emit WinnerPicked(recentWinner);
   }
 
   function getEntranceFee() public view returns (uint256) {
@@ -177,5 +177,9 @@ contract Raffle is VRFConsumerBaseV2, AutomationCompatible {
 
   function getLatestTimestamp() public view returns (uint256) {
     return s_lastTimeStamp;
+  }
+
+  function getInterval() public view returns (uint256) {
+    return i_interval;
   }
 }
