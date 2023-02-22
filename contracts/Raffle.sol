@@ -13,6 +13,7 @@ error Raffle__NotOwner();
 error Raffle__TransferFailed();
 error Raffle__NotOpen();
 error Raffle__UpkeepNotNeeded(uint256 currentBalance, uint256 numPlayers, uint256 raffleState);
+error Raffle__UserExist();
 
 /**@title A Lottery contract
  * @author Safar Kurbonov
@@ -26,6 +27,7 @@ contract Raffle is VRFConsumerBaseV2, AutomationCompatible {
   }
 
   address payable[] private s_players;
+  mapping(address => bool) private s_existancePlayer;
   uint256 private immutable i_entranceFee; // Плата за участие
   address payable private immutable i_owner;
 
@@ -55,6 +57,11 @@ contract Raffle is VRFConsumerBaseV2, AutomationCompatible {
     _;
   }
 
+  modifier userExist() {
+    if (s_existancePlayer[msg.sender]) revert Raffle__UserExist();
+    _;
+  }
+
   constructor(
     address _vrfCoordinator,
     uint256 _entranceFee,
@@ -76,7 +83,7 @@ contract Raffle is VRFConsumerBaseV2, AutomationCompatible {
     i_interval = interval;
   }
 
-  function enterRaffle() public payable {
+  function enterRaffle() public payable userExist {
     if (msg.value < i_entranceFee) {
       revert Raffle__NotEnoughETHEntered();
     }
@@ -84,6 +91,7 @@ contract Raffle is VRFConsumerBaseV2, AutomationCompatible {
       revert Raffle__NotOpen();
     }
     s_players.push(payable(msg.sender));
+    s_existancePlayer[msg.sender] = true;
 
     emit RaffleEnter(msg.sender);
   }
@@ -103,7 +111,7 @@ contract Raffle is VRFConsumerBaseV2, AutomationCompatible {
   ) public view override returns (bool upkeepNeeded, bytes memory /* performData */) {
     bool isOpen = (RaffleState.OPEN == s_raffleState);
     bool timePassed = (block.timestamp - s_lastTimeStamp) > i_interval;
-    bool hasPlayers = s_players.length > 0;
+    bool hasPlayers = s_players.length >= 5;
     bool hasBalance = address(this).balance > 0;
     upkeepNeeded = isOpen && timePassed && hasPlayers && hasBalance;
   }
@@ -141,6 +149,13 @@ contract Raffle is VRFConsumerBaseV2, AutomationCompatible {
     s_recentWinner = recentWinner;
 
     s_raffleState = RaffleState.OPEN;
+
+    uint256 length = s_players.length;
+
+    for (uint256 i = 0; i < length; i++) {
+      s_existancePlayer[s_players[i]] = false;
+    }
+
     s_players = new address payable[](0);
     s_lastTimeStamp = block.timestamp;
 
@@ -167,6 +182,14 @@ contract Raffle is VRFConsumerBaseV2, AutomationCompatible {
     return s_raffleState;
   }
 
+  function setRaffleState() public onlyOwner {
+    if (s_raffleState == RaffleState.OPEN) {
+      s_raffleState = RaffleState.CALCULATING;
+    } else {
+      s_raffleState = RaffleState.OPEN;
+    }
+  }
+
   function getNumWords() public pure returns (uint256) {
     return NUM_WORDS;
   }
@@ -181,5 +204,9 @@ contract Raffle is VRFConsumerBaseV2, AutomationCompatible {
 
   function getInterval() public view returns (uint256) {
     return i_interval;
+  }
+
+  function getExistaceOfPlayer(address adr) public view returns (bool) {
+    return s_existancePlayer[adr];
   }
 }
