@@ -44,6 +44,7 @@ contract Raffle is VRFConsumerBaseV2, AutomationCompatible {
   RaffleState private s_raffleState;
   uint256 private s_lastTimeStamp;
   uint256 private immutable i_interval;
+  bool private s_manualActivation;
 
   // Events (we have none!)
   event RaffleEnter(address indexed player);
@@ -111,7 +112,7 @@ contract Raffle is VRFConsumerBaseV2, AutomationCompatible {
   ) public view override returns (bool upkeepNeeded, bytes memory /* performData */) {
     bool isOpen = (RaffleState.OPEN == s_raffleState);
     bool timePassed = (block.timestamp - s_lastTimeStamp) > i_interval;
-    bool hasPlayers = s_players.length >= 5;
+    bool hasPlayers = s_players.length >= 5 || s_manualActivation;
     bool hasBalance = address(this).balance > 0;
     upkeepNeeded = isOpen && timePassed && hasPlayers && hasBalance;
   }
@@ -157,6 +158,7 @@ contract Raffle is VRFConsumerBaseV2, AutomationCompatible {
     }
 
     s_players = new address payable[](0);
+    s_manualActivation = false;
     s_lastTimeStamp = block.timestamp;
 
     (bool success, ) = recentWinner.call{value: address(this).balance}("");
@@ -208,5 +210,9 @@ contract Raffle is VRFConsumerBaseV2, AutomationCompatible {
 
   function getExistaceOfPlayer(address adr) public view returns (bool) {
     return s_existancePlayer[adr];
+  }
+
+  function setMaualActivation() public {
+    s_manualActivation = true;
   }
 }
